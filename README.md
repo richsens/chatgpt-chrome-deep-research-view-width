@@ -1,50 +1,93 @@
 # ChatGPT Deep Research Width
 
-一个用于 Chrome 的 Manifest V3 扩展，用来放宽 ChatGPT Deep Research 报告查看页的显示宽度，提供 `1.5x` 和 `2x` 两档。
+A Manifest V3 browser extension for widening ChatGPT Deep Research reports, with `1.5x` and `2x` presets for better table and chart readability.
 
-## 设计依据
+## Features
 
-你提供的页面快照里，主内容区使用了下面这组变量：
+- Presets: `Default`, `1.5x`, `2x`
+- Applies immediately from the popup
+- Targets Deep Research views without changing normal chat pages
+- Handles nested sandbox iframes used by the Deep Research report viewer
+
+## How It Works
+
+In ChatGPT Deep Research views, the visible report area is typically constrained by values such as:
 
 - `--thread-content-max-width: 40rem`
 - `@w-lg/main:[--thread-content-max-width:48rem]`
 
-也就是说在大屏下主报告容器最大宽度约为 `48rem = 768px`。再扣除左右 margin / padding，实际可读宽度会进一步缩小，所以表格会显得非常拥挤。
+On larger screens this usually means an effective content width of roughly `48rem = 768px`, and the actual readable body can become narrower after padding and margins are applied. This makes wide tables and dense report layouts harder to read.
 
-这个扩展的策略是：
+The extension uses a multi-layer strategy:
 
-- 检测页面中是否存在 `iframe[title="internal://deep-research"]`
-- 若存在，则把外层 thread 容器和 deep research 的 fixed shell 一并放宽
-- 若不存在，则不改动普通聊天页面
+- Detect `iframe[title="internal://deep-research"]` in the main `chatgpt.com` / `chat.openai.com` page
+- Widen the outer thread container and Deep Research shell
+- Handle the sandboxed Deep Research frame under `*.web-sandbox.oaiusercontent.com`
+- Inject a stylesheet into the innermost report document and override fixed `816px` widths with `!important`
 
-## 文件说明
+This is necessary because the Deep Research report is rendered through nested sandboxed iframes. The innermost report document typically contains fixed-width nodes similar to:
 
-- `manifest.json`: 扩展配置
-- `popup.html`: 弹出面板
-- `popup.css`: 弹出面板样式
-- `popup.js`: 保存用户选择并通知当前标签页
-- `content.js`: 动态检测并调整报告宽度
+- `div[style="width: 816px;"]`
+- `div._reportPage_*`
 
-## 安装方式
+## Project Structure
 
-1. 打开 Chrome，进入 `chrome://extensions/`
-2. 打开右上角“开发者模式”
-3. 点击“加载已解压的扩展程序”
-4. 选择目录 `/mnt/d/aitool/chatgptdr/chatgpt-deep-research-width`
+- `manifest.json`: extension manifest and permissions
+- `popup.html`: popup UI
+- `popup.css`: popup styles
+- `popup.js`: saves the selected preset and applies it immediately to all frames in the active tab via `chrome.scripting`
+- `content.js`: observes DOM changes and keeps width overrides applied across the main page, sandbox frame, and innermost report document
 
-Windows 资源管理器里对应路径通常是：
+## Permissions
 
-- `D:\aitool\chatgptdr\chatgpt-deep-research-width`
+The extension uses:
 
-## 使用方式
+- `storage`: persist the selected width preset
+- `tabs`: identify the active tab
+- `scripting`: apply width adjustments immediately across all frames in the active tab
 
-1. 打开 ChatGPT Deep Research 报告页面
-2. 点击扩展图标
-3. 选择 `默认`、`1.5 倍` 或 `2 倍`
-4. 当前页会立即应用
+Matched origins:
 
-## 已知限制
+- `https://chatgpt.com/*`
+- `https://chat.openai.com/*`
+- `https://*.web-sandbox.oaiusercontent.com/*`
 
-- ChatGPT 前端 DOM 结构如果后续改版，选择器可能需要跟着调整
-- 这个原型优先兼容你提供的页面结构，以及同类的 Deep Research 查看页
-- 由于 deep research 内容运行在内部 iframe 中，扩展无法直接改 iframe 内部排版，所以方案采用“放大外层承载宽度”的方式
+## Installation
+
+### Load unpacked in Chrome or other Chromium browsers
+
+1. Open `chrome://extensions/`
+2. Enable `Developer mode`
+3. Click `Load unpacked`
+4. Select the project folder:
+
+- `chatgpt-deep-research-width`
+
+## Usage
+
+1. Open a ChatGPT Deep Research report
+2. Click the extension icon
+3. Choose `Default`, `1.5x`, or `2x`
+4. The current page updates immediately
+
+## Compatibility
+
+Expected to work in Chromium-based browsers, including:
+
+- Chrome
+- Edge
+- Brave
+- Vivaldi
+- Arc
+
+Not guaranteed to work as-is in:
+
+- Firefox
+- Safari
+
+## Limitations
+
+- If ChatGPT changes its frontend DOM structure, the selectors may need to be updated
+- The current implementation targets the present Deep Research viewer structure and similar report layouts
+- The width override currently assumes the report still uses fixed-width structures around `816px`; if the viewer layout changes, the injected rules may need to be revised
+- The extension is intended for Chromium-based browsers and is not guaranteed to work in Firefox or Safari
