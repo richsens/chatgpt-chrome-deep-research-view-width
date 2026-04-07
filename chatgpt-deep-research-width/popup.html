@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Deep Research Width</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <h1>报告宽度</h1>
+      <p class="hint">仅在 ChatGPT Deep Research 查看页检测到报告 iframe 时生效。</p>
+      <form id="preset-form" class="preset-form">
+        <label class="option">
+          <input type="radio" name="widthPreset" value="default">
+          <span>默认</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="widthPreset" value="1.5x">
+          <span>1.5 倍</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="widthPreset" value="2x">
+          <span>2 倍</span>
+        </label>
+      </form>
+      <p id="status" class="status" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

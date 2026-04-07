@@ -1,0 +1,79 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.panel {
+  padding: 16px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.hint {
+  margin: 0 0 14px;
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.preset-form {
+  display: grid;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.8);
+  cursor: pointer;
+}
+
+.option:hover {
+  border-color: rgba(148, 163, 184, 0.7);
+}
+
+.option input {
+  margin: 0;
+}
+
+.status {
+  min-height: 18px;
+  margin: 12px 0 0;
+  color: #93c5fd;
+  font-size: 12px;
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    background: #f8fafc;
+    color: #0f172a;
+  }
+
+  .hint {
+    color: #475569;
+  }
+
+  .option {
+    background: #ffffff;
+    border-color: rgba(148, 163, 184, 0.45);
+  }
+
+  .status {
+    color: #1d4ed8;
+  }
+}
